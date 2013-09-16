@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>ClearSign: GPG signature verification</title>
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script src="http://clearsign.me/clearsign.js"></script>
+  </head>
+  <body>
+    <h1>Verify clear signed GPG text</h1>
+    <p>
+      This is a description of the project with links to the gnupg project.
+    </p>
+
+    <h3>Verified example</h3>
+    <div class="gpg-signed-text">
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+this is some test text
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (GNU/Linux)
+
+iD8DBQFDDA1eN5XoxaHnMrsRAsOPAKCBrt/YQuI8/rSD3rfQpYxJZowFPACdEYS5
+VoXLQNhyvirGLwvIZjuJLHY=
+=xGk+
+-----END PGP SIGNATURE-----
+    </div>
+    <h3>Failed verification example</h3>
+    <div class="gpg-signed-text">
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+this is some test text which will fail the verification.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (GNU/Linux)
+
+iD8DBQFDDA1eN5XoxaHnMrsRAsOPAKCBrt/YQuI8/rSD3rfQpYxJZowFPACdEYS5
+VoXLQNhyvirGLwvIZjuJLHY=
+=xGk+
+-----END PGP SIGNATURE-----
+
+    </div>
+
+    <h2>Instructions</h2>
+    Add this javascript to your project:
+    <pre><script src="http://clearsign.me/clearsign.js"/></script></pre>
+    Alternatively you can check this project out.
+  </body>
+</html>

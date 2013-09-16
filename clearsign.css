@@ -1,0 +1,40 @@
+/**
+ * Selectors for this file are created in clearsign.js
+ */
+
+/* GPG text container. */
+.gpg-signed-text{
+  border: 1px dotted #cccccc;
+  padding: 10px;
+  margin: 10px;
+}
+
+.gpg-displayed-text {
+}
+
+.gpg-displayed-status {
+   border-top: 1px dotted #cccccc;
+   height: 20px;
+}
+
+
+.gpg-displayed-status .status {
+  float: right;
+}
+.gpg-displayed-status ul {
+  list-style: none;
+}
+
+.gpg-displayed-status ul li {
+  display: inline;
+  margin: 0 10px;
+  cursor: pointer;
+}
+
+.gpg-displayed-status ul li.open {
+  background-color: #aaaaaa;
+}
+
+.gpg-raw-text {
+  display: none;
+}
