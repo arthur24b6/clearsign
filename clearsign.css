@@ -3,7 +3,7 @@
  */
 
 /* GPG text container. */
-.gpg-signed-text{
+.gpg-signed-text {
   border: 1px dotted #cccccc;
   padding: 10px;
   margin: 10px;
@@ -15,12 +15,14 @@
   margin: 10px;
 }
 
-.gpg-signed-text.verification-failed {
+.gpg-signed-text.error{
   border: 1px dotted red;
 }
 
-.gpg-displayed-text {
+.gpg-signed-text.failed {
+  border: 1px dotted #ff0000;
 }
+
 
 .gpg-raw-text {
   display: none;
@@ -36,6 +38,7 @@
   float: right;
   margin-top: 10px;
   margin-right: -11px;
+  cursor: pointer;
 }
 
 .clearsign-badge .interior {
@@ -58,11 +61,20 @@
   float: right;
 }
 
-.verification-failed .clearsign-badge  .status {
-  background-color: #ff8080;
-}
 
-.verified .clearsign-badge  .status {
+
+.gpg-signed-text.verified .clearsign-badge .status {
   background-color: #ccffcc;
 }
+
+.gpg-signed-text.error .clearsign-badge .status {
+  background-color: #ff9933;
+}
+
+.gpg-signed-text.failed .clearsign-badge .status {
+  background-color: #dd0000;
+  color: #ffffff;
+  font-weight: bold;
+}
+
 

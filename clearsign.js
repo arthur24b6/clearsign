@@ -128,18 +128,16 @@ $.fn.clearsign = function(options) {
 
     // -----------------------------------------------------------
 
-
-
     // Load the css.
     loadCSS(settings)
 
-    // Get the input text.
-    var signed_text = $(this).text();
+    // Get the input text and trim whitespace.
+    var signed_text = $(this).text().replace(/^ +| +$/gm, "");
 
-    // Remove existing markup.
+    // Remove existing markup from the container.
     $(this).html('');
 
-    // Build the clearsign markup.
+    // Build the ClearSign markup.
     buildHTML();
 
     // Populate the HTML with the signature parts.
@@ -148,12 +146,21 @@ $.fn.clearsign = function(options) {
 
     // Post the signed text to the verifier.
     var post = $.post(settings.path + settings.gpgValidatorPath, {signed_text : signed_text }, function(data) {
+      // Verification failed with a non-catchable error.
+      if (data === false) {
+        $(element).addClass('error');
+        $('.clearsign-badge .status', element).html('ERROR');
+      }
+
       // Signature error condition.
-      if (typeof data.error !== 'undefined' && data.error) {
+      else if (typeof data.error !== 'undefined' && data.error) {
         var string = data.error;
-        $(element).addClass('verification-failed');
+        // @TODO provide information on why this failed.
+        $(element).addClass('failed');
         $('.clearsign-badge .status', element).html('FAILED');
       }
+
+      // Signature should be valid.
       else {
         var string = htmlEntityEncode(data.name) + ' | ' + htmlEntityEncode(data.date) + ' | ' + data.id;
         $(element).addClass('verified');
