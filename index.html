@@ -3,48 +3,83 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>ClearSign: GPG signature verification</title>
-    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-    <script src="http://clearsign.me/clearsign.js"></script>
+    <script src="//localhost/clearsign.js"></script>
+    <style>
+      body {
+        background-color: #cccccc;
+      }
+      #wrapper {
+        background-color: #ffffff;
+        max-width: 720px;
+        margin-left: auto;
+        margin-right: auto;
+        border: 1px solid #cccccc;
+        border-top: none;
+      }
+      #header {
+        padding: 0px 10px 0px 10px;
+        background-color: #aaaaaa;
+      }
+      #content {
+        padding: 0px 20px 20px 20px;
+      }
+
+    </style>
   </head>
   <body>
-    <h1>Verify clear signed GPG text</h1>
-    <p>
-      This is a description of the project with links to the gnupg project.
-    </p>
+    <div id="wrapper">
+      <div id="header">
+        <h1>Verify clear signed GPG text</h1>
+      </div>
+      <div id="content">
+        <p>
+          This is a description of the project with links to the gnupg project.
+          <ul>
+            <li>Examples</li>
+            <li>How to implement</li>
+            <li>Background</li>
+          </ul>
+        </p>
 
-    <h3>Verified example</h3>
-    <div class="gpg-signed-text">
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+        <h2>Examples</h2>
 
-this is some test text
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.1 (GNU/Linux)
+        <h3>Verified example</h3>
+        <div class="gpg-signed-text">
+    -----BEGIN PGP SIGNED MESSAGE-----
+    Hash: SHA1
 
-iD8DBQFDDA1eN5XoxaHnMrsRAsOPAKCBrt/YQuI8/rSD3rfQpYxJZowFPACdEYS5
-VoXLQNhyvirGLwvIZjuJLHY=
-=xGk+
------END PGP SIGNATURE-----
+    This is a text file
+
+    -----BEGIN PGP SIGNATURE-----
+    Version: GnuPG/MacGPG2 v2.0.20 (Darwin)
+    Comment: GPGTools - http://gpgtools.org
+
+    iEYEARECAAYFAlIwon4ACgkQdd4ilEXAI+32ywCfbbMs+6ZyeGzFrkvqiE4Hq14w
+    QOwAn3Qt7UEEr8YJ77L2C1ATK3sluq2r
+    =IsBx
+    -----END PGP SIGNATURE-----
+        </div>
+        <h3>Failed verification example</h3>
+        <div class="gpg-signed-text">
+    -----BEGIN PGP SIGNED MESSAGE-----
+    Hash: SHA1
+
+    this is some test text which will fail the verification.
+    -----BEGIN PGP SIGNATURE-----
+    Version: GnuPG v1.4.1 (GNU/Linux)
+
+    iD8DBQFDDA1eN5XoxaHnMrsRAsOPAKCBrt/YQuI8/rSD3rfQpYxJZowFPACdEYS5
+    VoXLQNhyvirGLwvIZjuJLHY=
+    =xGk+
+    -----END PGP SIGNATURE-----
+
+        </div>
+
+        <h2>Instructions</h2>
+        Add this javascript to your project:
+        <pre><script src="http://clearsign.me/clearsign.js"/></script></pre>
+        Alternatively you can check this project out.
+      </div>
     </div>
-    <h3>Failed verification example</h3>
-    <div class="gpg-signed-text">
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
-
-this is some test text which will fail the verification.
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.1 (GNU/Linux)
-
-iD8DBQFDDA1eN5XoxaHnMrsRAsOPAKCBrt/YQuI8/rSD3rfQpYxJZowFPACdEYS5
-VoXLQNhyvirGLwvIZjuJLHY=
-=xGk+
------END PGP SIGNATURE-----
-
-    </div>
-
-    <h2>Instructions</h2>
-    Add this javascript to your project:
-    <pre><script src="http://clearsign.me/clearsign.js"/></script></pre>
-    Alternatively you can check this project out.
   </body>
 </html>
