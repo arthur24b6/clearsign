@@ -23,15 +23,15 @@ else {
 // Code to be run after it is clear that jQuery is enabled
 function main() {
 
-  // Enable on all signed text containers.
-  $(document).ready(function() {
-    $('.gpg-signed-text').clearsign();
-  });
+// Enable on all signed text containers.
+$(document).ready(function() {
+  $('.gpg-signed-text').clearsign();
+});
 
 
-  // jQuery plugin.
-  $.fn.clearsign = function(options) {
-    return this.each(function () {
+// jQuery plugin.
+$.fn.clearsign = function(options) {
+  return this.each(function () {
 
     // Default options.
     var settings = $.extend({
@@ -158,7 +158,6 @@ function main() {
       }
       $('.' + settings.css.displayedStatus + ' .data', element).html(string);
      }, 'json');
-
 
 
     });
