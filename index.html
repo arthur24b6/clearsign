@@ -7,78 +7,103 @@
     <style>
       body {
         background-color: #cccccc;
+        font-family: Helvetica, Arial, sans-serif;
       }
       #wrapper {
-        background-color: #ffffff;
         max-width: 720px;
         margin-left: auto;
         margin-right: auto;
         border: 1px solid #cccccc;
         border-top: none;
+        margin-top: 20px;
       }
       #header {
-        padding: 0px 10px 0px 10px;
-        background-color: #aaaaaa;
+        border-top-left-radius: 20px 20px;
+        border-top-right-radius: 20px 20px;
+        -moz-border-top-left-radius: 20px 20px;
+        -moz-border-top-right-radius: 20px 20px;
+        padding: 16px 20px 0px 15px;
+        background-color: #aaccee;
+        height: 45px;
+      }
+      #header h1 {
+        margin: 0;
+        padding: 0;
       }
       #content {
-        padding: 0px 20px 20px 20px;
+        background-color: #ffffff;
+        padding: 10px 20px 20px 20px;
       }
-
+      #sun {
+        float:right;
+        font-size: 32px;
+        font-weight: bold;
+        margin-top: -3px;
+      }
     </style>
   </head>
   <body>
     <div id="wrapper">
       <div id="header">
+        <span id="sun">&#9788;</span>
         <h1>Verify clear signed GPG text</h1>
       </div>
       <div id="content">
         <p>
           This is a description of the project with links to the gnupg project.
-          <ul>
-            <li>Examples</li>
-            <li>How to implement</li>
-            <li>Background</li>
-          </ul>
         </p>
+        <ul>
+          <li>Examples</li>
+          <li>How to implement</li>
+          <li>Background</li>
+        </ul>
+
 
         <h2>Examples</h2>
 
         <h3>Verified example</h3>
         <div class="gpg-signed-text">
-    -----BEGIN PGP SIGNED MESSAGE-----
-    Hash: SHA1
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-    This is a text file
+This is a text file
 
-    -----BEGIN PGP SIGNATURE-----
-    Version: GnuPG/MacGPG2 v2.0.20 (Darwin)
-    Comment: GPGTools - http://gpgtools.org
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG/MacGPG2 v2.0.20 (Darwin)
+Comment: GPGTools - http://gpgtools.org
 
-    iEYEARECAAYFAlIwon4ACgkQdd4ilEXAI+32ywCfbbMs+6ZyeGzFrkvqiE4Hq14w
-    QOwAn3Qt7UEEr8YJ77L2C1ATK3sluq2r
-    =IsBx
-    -----END PGP SIGNATURE-----
+iEYEARECAAYFAlIwon4ACgkQdd4ilEXAI+32ywCfbbMs+6ZyeGzFrkvqiE4Hq14w
+QOwAn3Qt7UEEr8YJ77L2C1ATK3sluq2r
+=IsBx
+-----END PGP SIGNATURE-----
         </div>
         <h3>Failed verification example</h3>
         <div class="gpg-signed-text">
-    -----BEGIN PGP SIGNED MESSAGE-----
-    Hash: SHA1
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-    this is some test text which will fail the verification.
-    -----BEGIN PGP SIGNATURE-----
-    Version: GnuPG v1.4.1 (GNU/Linux)
+this is some test text which will fail the verification.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (GNU/Linux)
 
-    iD8DBQFDDA1eN5XoxaHnMrsRAsOPAKCBrt/YQuI8/rSD3rfQpYxJZowFPACdEYS5
-    VoXLQNhyvirGLwvIZjuJLHY=
-    =xGk+
-    -----END PGP SIGNATURE-----
+iD8DBQFDDA1eN5XoxaHnMrsRAsOPAKCBrt/YQuI8/rSD3rfQpYxJZowFPACdEYS5
+VoXLQNhyvirGLwvIZjuJLHY=
+=xGk+
+-----END PGP SIGNATURE-----
 
         </div>
 
-        <h2>Instructions</h2>
+        <h2>How to implement</h2>
         Add this javascript to your project:
-        &lt;script src="http://clearsign.me/clearsign.js"/&gt;&lt;/script&gt;
-        Alternatively you can check this project out.
+        <p>
+        <code>&lt;script src="http://clearsign.me/clearsign.js"/&gt;&lt;/script&gt;</code>
+        </p>
+        Alternatively you can check this project out from github:
+        <p>
+          <a href="https://github.com/arthur24b6/clearsign">https://github.com/arthur24b6/clearsign</a>
+        </p>
+
+        <h2>Background</h2>
       </div>
     </div>
   </body>

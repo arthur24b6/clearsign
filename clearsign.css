@@ -22,29 +22,47 @@
 .gpg-displayed-text {
 }
 
-.gpg-displayed-status {
-   border-top: 1px dotted #cccccc;
-   height: 20px;
-}
-
-
-.gpg-displayed-status .status {
-  float: right;
-}
-.gpg-displayed-status ul {
-  list-style: none;
-}
-
-.gpg-displayed-status ul li {
-  display: inline;
-  margin: 0 10px;
-  cursor: pointer;
-}
-
-.gpg-displayed-status ul li.open {
-  background-color: #aaaaaa;
-}
-
 .gpg-raw-text {
   display: none;
 }
+
+
+.clearsign-badge {
+  background-color: #ffffff;
+  border: 1px solid #aaaaaa;
+  padding: 1px;
+  height: 12px;
+  font-size: 9px;
+  float: right;
+  margin-top: 10px;
+  margin-right: -11px;
+}
+
+.clearsign-badge .interior {
+  background-color: #aaccee;
+  height: 12px;
+}
+
+.clearsign-badge .brand {
+  float: left;
+  border-right: 1px solid #ffffff;
+  padding: 2px 5px 2px 5px;
+  text-align: right;
+  height: 9px;
+  color: #ffffff;
+}
+
+.clearsign-badge .status {
+  padding: 2px 5px 0px 6px;
+  text-align: center;
+  float: right;
+}
+
+.verification-failed .clearsign-badge  .status {
+  background-color: #ff8080;
+}
+
+.verified .clearsign-badge  .status {
+  background-color: #ccffcc;
+}
+

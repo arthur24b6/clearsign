@@ -39,7 +39,6 @@ $.fn.clearsign = function(options) {
       cssPath : 'clearsign.css',
       css : {
         displayedText : 'gpg-displayed-text',
-        displayedStatus : 'gpg-displayed-status',
         displayedRawText : 'gpg-raw-text'
       },
       gpgValidatorPath : 'clearsign.php'
@@ -95,15 +94,17 @@ $.fn.clearsign = function(options) {
      * Add the HTML for displaying the signature information.
      */
     function buildHTML() {
+      // Store the text that was signed here.
       $(element).append('<div class="' + settings.css.displayedText + '" />');
-
+      // Full signed text stored here.
       $(element).append('<div class="' + settings.css.displayedRawText + '" />');
       $('.' + settings.css.displayedRawText, element).wrapInner('<pre />');
 
-      $(element).append('<div class="' + settings.css.displayedStatus + '" />');
-      $('.' + settings.css.displayedStatus, element).append('<div class="data"></div><div class="status"><ul><li class="status">Status</li><li class="raw">Raw</li><li class="help">Help</li></ul></div>');
 
-      $('.' + settings.css.displayedStatus + ' li.raw', element).click(function () {
+      // Build the badge attached to the signed text.
+      $(element).append('<div class="clearsign-badge"><div class="interior"><div class="brand">ClearSigned</div><div class="status">Status</div></div></div>');
+
+      $('.clearsign-badge', element).click(function () {
         if ($(this).hasClass('open')) {
           $(this).removeClass('open');
           $('.' + settings.css.displayedRawText, element).hide(300);
@@ -113,6 +114,7 @@ $.fn.clearsign = function(options) {
           $('.' + settings.css.displayedRawText, element).show(300);
         }
       });
+
     }
 
 
@@ -146,15 +148,16 @@ $.fn.clearsign = function(options) {
 
     // Post the signed text to the verifier.
     var post = $.post(settings.path + settings.gpgValidatorPath, {signed_text : signed_text }, function(data) {
-      console.log(data);
       // Signature error condition.
       if (typeof data.error !== 'undefined' && data.error) {
         var string = data.error;
         $(element).addClass('verification-failed');
+        $('.clearsign-badge .status', element).html('FAILED');
       }
       else {
         var string = htmlEntityEncode(data.name) + ' | ' + htmlEntityEncode(data.date) + ' | ' + data.id;
         $(element).addClass('verified');
+        $('.clearsign-badge .status', element).html('VALID');
       }
       $('.' + settings.css.displayedStatus + ' .data', element).html(string);
      }, 'json');

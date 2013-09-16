@@ -43,7 +43,7 @@ function get_key($signed_text) {
   $gpg_path = get_gpg_path();
 
   // Verify the signature.
-  exec("echo $signed_text | $gpg_path -n --verify 2>&1", $output, $ret);
+  exec("echo $signed_text | $gpg_path -n  --enable-special-filenames --verify  2>&1", $output, $ret);
 
   // Make returned data easily matchable.
   $output = implode(';', $output);
@@ -124,21 +124,20 @@ function key_lookup($key) {
 if (empty($_POST['signed_text'])) {
 // Dummy text to try.
 $signed_text =
-"-----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+"-----BEGIN PGP SIGNATURE-----
+Version: GnuPG/MacGPG2 v2.0.20 (Darwin)
+Comment: GPGTools - http://gpgtools.org
 
-this is some test text which will fail the verification.
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.1 (GNU/Linux)
-
-iD8DBQFDDA1eN5XoxaHnMrsRAsOPAKCBrt/YQuI8/rSD3rfQpYxJZowFPACdEYS5
-VoXLQNhyvirGLwvIZjuJLHY=
-=xGk+
+iEYEARECAAYFAlIwon4ACgkQdd4ilEXAI+32ywCfbbMs+6ZyeGzFrkvqiE4Hq14w
+QOwAn3Qt7UEEr8YJ77L2C1ATK3sluq2r
+=IsBx
 -----END PGP SIGNATURE-----";
 }
 else {
   $signed_text = $_POST['signed_text'];
 }
+
+// @TODO should probably try to trim whitespace here.
 $signed_text = escapeshellarg($signed_text);
 
 
