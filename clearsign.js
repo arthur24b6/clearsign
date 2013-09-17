@@ -99,19 +99,19 @@ $.fn.clearsign = function(options) {
       // Full signed text stored here.
       $(element).append('<div class="' + settings.css.signatureInfo + '" />');
       $('.' + settings.css.signatureInfo, element).wrapInner('<pre />');
-      $('.'+ settings.css.signatureInfo, element).prepend();
+      $('.'+ settings.css.signatureInfo, element).prepend('<div class="info" />');
 
       // Build the badge attached to the signed text.
-      $(element).append('<div class="clearsign-badge"><div class="interior"><div class="brand">ClearSigned</div><div class="status">Status</div></div></div>');
+      $(element).append('<div class="clearsign-badge"><div class="interior"><div class="brand">ClearSign</div><div class="status">Checking</div></div></div>');
 
       $('.clearsign-badge', element).click(function () {
         if ($(this).hasClass('open')) {
           $(this).removeClass('open');
-          $('.' + settings.css.displayedRawText, element).hide(300);
+          $('.' + settings.css.signatureInfo, element).hide(300);
         }
         else {
           $(this).addClass('open');
-          $('.' + settings.css.displayedRawText, element).show(300);
+          $('.' + settings.css.signatureInfo, element).show(300);
         }
       });
 
@@ -142,7 +142,9 @@ $.fn.clearsign = function(options) {
 
     // Populate the HTML with the signature parts.
     $('.' + settings.css.displayedText, this).html(getSignedText(signed_text));
-    $('.' + settings.css.displayedRawText + ' pre', this).html(signed_text);
+    $('.' + settings.css.signatureInfo + ' pre', this).html(signed_text);
+    $(element).addClass('validating');
+
 
     // Post the signed text to the verifier.
     var post = $.post(settings.path + settings.gpgValidatorPath, {signed_text : signed_text }, function(data) {
@@ -162,11 +164,18 @@ $.fn.clearsign = function(options) {
 
       // Signature should be valid.
       else {
-        var string = htmlEntityEncode(data.name) + ' | ' + htmlEntityEncode(data.date) + ' | ' + data.id;
-        $(element).addClass('verified');
+        var string = '';
+        string = '<strong>Signature information:</strong><br />';
+        string += 'This text was signed by: ' + htmlEntityEncode(data.name) + ' ';
+        string += 'on ' + htmlEntityEncode(data.date) + ' ';
+        string += 'with key ID: ' + data.id;
+
+        $(element).addClass('valid');
         $('.clearsign-badge .status', element).html('VALID');
       }
-      $('.' + settings.css.displayedStatus + ' .data', element).html(string);
+      $('.' + settings.css.signatureInfo + ' .info', element).html(string);
+
+      $(element).removeClass('validating');
      }, 'json');
 
 

@@ -28,6 +28,18 @@
   display: none;
 }
 
+.gpg-signature-info .info {
+  border-top: 4px solid #CCCCCC;
+  font-size: 12px;
+  margin: 10px 0px;
+  padding: 10px;
+  line-height: 1.4;
+}
+
+.gpg-signature-info pre {
+  margin: 0 10px;
+}
+
 
 .clearsign-badge {
   background-color: #ffffff;
@@ -35,36 +47,43 @@
   padding: 1px;
   height: 12px;
   font-size: 9px;
+  font-weight: bold;
   float: right;
   margin-top: 10px;
   margin-right: -11px;
+  width: 100px;
   cursor: pointer;
 }
 
 .clearsign-badge .interior {
-  background-color: #aaccee;
+  background-color: #95B7D9;
   height: 12px;
 }
 
 .clearsign-badge .brand {
   float: left;
   border-right: 1px solid #ffffff;
-  padding: 2px 5px 2px 5px;
+  padding: 2px 3px;
   text-align: right;
   height: 9px;
   color: #ffffff;
+  width: 47px;
+  text-align: center;
 }
 
 .clearsign-badge .status {
-  padding: 2px 5px 0px 6px;
+  padding: 2px 4px 0 2px;
   text-align: center;
+  width: 40px;
   float: right;
 }
 
+.gpg-signed-text.validating .clearsign-badge .status {
+  background-color: yellow;
+}
 
-
-.gpg-signed-text.verified .clearsign-badge .status {
-  background-color: #ccffcc;
+.gpg-signed-text.valid .clearsign-badge .status  {
+  background-color: #8de390;
 }
 
 .gpg-signed-text.error .clearsign-badge .status {
@@ -74,7 +93,6 @@
 .gpg-signed-text.failed .clearsign-badge .status {
   background-color: #dd0000;
   color: #ffffff;
-  font-weight: bold;
 }
 
 
