@@ -48,9 +48,9 @@
   height: 12px;
   font-size: 9px;
   font-weight: bold;
+  line-height: 1.1em;
   float: right;
-  margin-top: 10px;
-  margin-right: -11px;
+  margin: 10px -11px 0 0;
   width: 100px;
   cursor: pointer;
 }
