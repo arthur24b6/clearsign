@@ -9,122 +9,131 @@
  */
 
 
-/**
- * Get the path to the GPG binary.
- *
- * @TODO need to do error checking if binary is not found.
- * @TODO should check for gpg2 as well.
- *
- * @return string
- */
-function get_gpg_path() {
-  static $path = FALSE;
-  if (! $path) {
-    $path = exec('export PATH=/usr/local/bin:/usr/bin:$PATH; which gpg');
+class clearSign {
+
+  /**
+   * Run the full verification process.
+   *
+   * @param string $signed_text
+   */
+  function __construct($signed_text) {
+    $this->signed_text = escapeshellarg($signed_text);
+    $this->get_gpg_path();
+    $this->get_keychain_path();
+    $this->get_key_id();
+    $this->key_lookup();
   }
-  return $path;
+
+
+  /**
+   * Shutdown cleanup.
+   */
+  function __destruct() {
+    unlink($this->tmp_keychain);
+  }
+
+
+  /**
+   * Get the path to the GPG binary.
+   *
+   * @TODO need to do error checking if binary is not found.
+   * @TODO should check for gpg2 as well.
+   */
+  private function get_gpg_path() {
+    $this->gpg_path = exec('export PATH=/usr/local/bin:/usr/bin:$PATH; which gpg');
+  }
+
+
+  /**
+   * Create a path for the temporary keychain.
+   *
+   * @param string $signed_text
+   */
+  private function get_keychain_path() {
+    $name = '/tmp/' . md5($this->signed_text . microtime()) . '.gpg';
+    $this->tmp_keychain = $name;
+  }
+
+
+  /**
+   * Fetches the key by running the clearsigned text through gpg.
+   *
+   * @TODO regexs need to be thought through.
+   * @TODO this should do some caching of keys in a database for performance.
+   *
+   * @param string $signed_text
+   *   Clear signed text to verify
+   * @return string
+   *   Key ID
+   */
+  private function get_key_id() {
+    // Verify the signature to find the ID.
+    exec("echo {$this->signed_text} | {$this->gpg_path} -n --verify  2>&1", $output, $ret);
+
+    // Make returned data easily matchable.
+    $output = implode(' ', $output);
+
+    // Find the key ID.
+    $pattern = "/.*key ID ([a-zA-z0-9]*) /";
+    if (preg_match($pattern, $output, $matches)) {
+      $this->key['id'] = $matches[1];
+    }
+  }
+
+
+  /**
+   * Looks up the key from a keyserver.
+   *
+   * @TODO handle error condition where key "XXXXXX" not found on keyserver
+   *
+   * @param string $key_id
+   *   Id of the key to look up
+   * @return array
+   *   Key information.
+   */
+  private function key_lookup() {
+    // Fetch the key and place it in the temporary key chain.
+    exec("{$this->gpg_path} --no-default-keyring --keyring {$this->tmp_keychain} --recv-keys {$this->key['id']} 2>&1");
+
+    // Use the imported key to check the signed text.
+    exec("echo {$this->signed_text} | {$this->gpg_path} --no-default-keyring --keyring {$this->tmp_keychain} --verify 2>&1", $output, $ret);
+
+    // Collapse the output.
+    $output = implode(';', $output);
+
+    // Get signature data.
+    $pattern = '/.*Signature made (.*) using.*key ID (.*?);/';
+    if (preg_match($pattern, $output, $matches)) {
+      $this->key['date'] = $matches[1];
+      $this->key['id'] = $matches[2];
+    }
+
+    // Check for a bad signature.
+    $pattern = '/BAD signature/';
+    if (preg_match($pattern, $output)) {
+      $this->key['error'] = 'Bad signature';
+    }
+
+    // Check for any valid key data that is achived on --verify.
+    $pattern = '/.*Good signature from "(.*?)";/';
+    if (preg_match($pattern, $output, $matches)) {
+      $this->key['name'] = $matches[1];
+    }
+  }
+
 }
 
 
-/**
- * Fetches the key by running the clearsigned text through gpg.
- *
- * If this returns FALSE the signed text is not valid.
- *
- * @TODO these regexs need to be thought through.
- * @TODO this should do some caching of keys in a database for performance.
- *
- * @param string $signed_text
- *   Clear signed text to verify
- * @return string
- *   Key ID
- */
-function get_key($signed_text) {
-  $gpg_path = get_gpg_path();
-
-  // Verify the signature.
-  exec("echo $signed_text | $gpg_path -n  --enable-special-filenames --verify  2>&1", $output, $ret);
-
-  // Make returned data easily matchable.
-  $output = implode(';', $output);
-
-  // Check for a bad signature.
-  $pattern = '/BAD signature/';
-  if (preg_match($pattern, $output)) {
-    $key['error'] = 'Bad signature';
-    return $key;
-  }
-
-  // Check for any valid key data that is achived on --verify.
-  $pattern = '/.*Signature made (.*) using.*key ID (.*?);.*Good signature from "(.*?)";/';
-  if (preg_match($pattern, $output, $matches)) {
-    $key['date'] = $matches[1];
-    $key['id'] = $matches[2];
-    $key['name'] = $matches[3];
-    return $key;
-  }
-
-  // No data, just find the key ID.
-  $pattern = "/.*key ID ([a-zA-z0-9]*)\;/";
-  if (preg_match($pattern, $output, $matches)) {
-    $key['id'] = $matches[1];
-    return $key;
-  }
-
-  // @TODO error handling.
-
-  // No valid data found.
-  return FALSE;
-}
-
-
-/**
- * Looks up the key from a keyserver.
- *
- * @TODO handle error condition where key "XXXXXX" not found on keyserver
- *
- * @param string $key_id
- *   Id of the key to look up
- * @return array
- *   Key information.
- */
-function key_lookup($key) {
-  $gpg_path = get_gpg_path();
-
-  // The key has to have the 0x prepended to it to search on
-  $key_id = '0x' . $key['id'];
-
-  $command = get_gpg_path() . " --keyserver pgp.mit.edu  --search-keys $key_id";
-
-  $descriptorspec = array(
-    0 => array("pipe", "r"),
-    1 => array("pipe", "w")
-  );
-
-  $process = proc_open($command, $descriptorspec, $pipes);
-  if (is_resource($process)) {
-    list ($out, $in) = $pipes;
-    fwrite($out, "1\n");
-    $output = stream_get_contents($in);
-  }
-
-  // Output should be in the format of:
-  // (1)	name <email@email.net>
-	//  1024 bit DSA key KEYID, created: YYYY-MM-DD
-  $pattern = "/.*\).(.*)/";
-  if (preg_match($pattern, $output, $matches)) {
-    $key['name'] = $matches[1];
-    return $key;
-  }
-
-  return FALSE;
-}
 
 
 if (empty($_POST['signed_text'])) {
-// Dummy text to try.
-$signed_text =
-"-----BEGIN PGP SIGNATURE-----
+  // Dummy text to try.
+  $signed_text = "-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+This is a text file
+
+-----BEGIN PGP SIGNATURE-----
 Version: GnuPG/MacGPG2 v2.0.20 (Darwin)
 Comment: GPGTools - http://gpgtools.org
 
@@ -137,36 +146,9 @@ else {
   $signed_text = $_POST['signed_text'];
 }
 
-// @TODO should probably try to trim whitespace here.
-$signed_text = escapeshellarg($signed_text);
 
+$verify = new clearSign($signed_text);
 
-if ($key = get_key($signed_text)) {
-  if (!empty($key['error']) || (!empty($key['name']) && !empty($key['date']))) {
-    print json_encode($key);
-  }
-  // Key was not found, look it up with the keyserver.
-  else if ($key = key_lookup($key)) {
-    print json_encode($key);
-  }
-}
-else {
-  // @TODO error condition
-  print json_encode($key);
-}
+print json_encode($verify->key);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+exit();
