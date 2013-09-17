@@ -11,7 +11,7 @@ if (typeof jQuery=='undefined') {
   var headTag = document.getElementsByTagName("head")[0];
   var jqTag = document.createElement('script');
   jqTag.type = 'text/javascript';
-  jqTag.src = 'jquery-1.10.1.min.js';
+  jqTag.src = '//clearsign.me/jquery-1.10.1.min.js';
   jqTag.onload = main;
   headTag.appendChild(jqTag);
 }
@@ -35,7 +35,7 @@ $.fn.clearsign = function(options) {
 
     // Default options.
     var settings = $.extend({
-      path : '/',
+      path : '//clearsign.me/',
       cssPath : 'clearsign.css',
       css : {
         displayedText : 'gpg-displayed-text',
