@@ -12,4 +12,4 @@ ClearSign to show the signature text and the validity of the signature.
 In order to keep the implementation as simple as possible, ClearSign adds jQuery
 (if not already present) and a CSS file in the single included Javascript.
 
-See a demo: http://clearsign.me/
+See a demo: https://clearsign.me/
