@@ -39,7 +39,7 @@ $.fn.clearsign = function(options) {
       cssPath : 'clearsign.css',
       css : {
         displayedText : 'gpg-displayed-text',
-        displayedRawText : 'gpg-raw-text'
+        signatureInfo : 'gpg-signature-info'
       },
       gpgValidatorPath : 'clearsign.php'
     }, options );
@@ -97,9 +97,9 @@ $.fn.clearsign = function(options) {
       // Store the text that was signed here.
       $(element).append('<div class="' + settings.css.displayedText + '" />');
       // Full signed text stored here.
-      $(element).append('<div class="' + settings.css.displayedRawText + '" />');
-      $('.' + settings.css.displayedRawText, element).wrapInner('<pre />');
-
+      $(element).append('<div class="' + settings.css.signatureInfo + '" />');
+      $('.' + settings.css.signatureInfo, element).wrapInner('<pre />');
+      $('.'+ settings.css.signatureInfo, element).prepend();
 
       // Build the badge attached to the signed text.
       $(element).append('<div class="clearsign-badge"><div class="interior"><div class="brand">ClearSigned</div><div class="status">Status</div></div></div>');
