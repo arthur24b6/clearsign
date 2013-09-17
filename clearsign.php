@@ -2,12 +2,21 @@
 
 /**
  * @file
- * Provides the PHP wrapper around GPG. Not implementing the pear version of
- * gpg because it doesn't offer a verify option that can be used to look up
- * the key id's identity.
- *
+ * Provides the PHP wrapper around GPG.
  */
 
+
+// Set the headers to allow cross domain posts from javascript.
+header('Access-Control-Allow-Origin: *');
+// Get the posted signed text
+$signed_text = $_POST['signed_text'];
+
+// Verify.
+$verify = new clearSign($signed_text);
+// Output.
+print json_encode($verify->key);
+
+/* ***************************************** */
 
 class clearSign {
 
@@ -123,32 +132,3 @@ class clearSign {
 
 }
 
-
-
-
-if (empty($_POST['signed_text'])) {
-  // Dummy text to try.
-  $signed_text = "-----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
-
-This is a text file
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG/MacGPG2 v2.0.20 (Darwin)
-Comment: GPGTools - http://gpgtools.org
-
-iEYEARECAAYFAlIwon4ACgkQdd4ilEXAI+32ywCfbbMs+6ZyeGzFrkvqiE4Hq14w
-QOwAn3Qt7UEEr8YJ77L2C1ATK3sluq2r
-=IsBx
------END PGP SIGNATURE-----";
-}
-else {
-  $signed_text = $_POST['signed_text'];
-}
-
-
-$verify = new clearSign($signed_text);
-
-print json_encode($verify->key);
-
-exit();
