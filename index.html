@@ -3,7 +3,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>ClearSign: GPG signature verification</title>
-    <script src="https://clearsign.me/clearsign.js"></script>
+    <script src="http://localhost/clearsign.js"></script>
     <style>
       body {
         background-color: #cccccc;
@@ -39,11 +39,16 @@
         float:right;
         font-size: 32px;
         font-weight: bold;
-        margin-top: -3px;
+        margin-top: 1px;
       }
       h2 {
         margin-top: 50px;
         margin: 50px 0 10px 0;
+      }
+      pre {
+        border: 1px solid #cccccc;
+        padding: 10px;
+        overflow: scroll;
       }
     </style>
   </head>
@@ -57,13 +62,16 @@
 
         <p>ClearSign makes it easy to verify <a href="http://www.gnupg.org">GPG</a>
           signed text blocks on webpages with a simple Javascript inclusion.</p>
-        <p>ClearSign works by sending signed text from an HTML element back to a PHP wrapper
-around GPG to extract the signing key id, fetching the key id from a key server
-and validating the signed text against the key. Markup on the page is altered by
-ClearSign to show the signature text and the validity of the signature.</p>
 
-        <p>In order to keep the implementation as simple as possible, ClearSign adds jQuery
-(if not already present) and a CSS file in the single included Javascript.</p>
+        <p>ClearSign works by sending signed text from an HTML element back to a
+          PHP wrapper around GPG to extract the signing key id, fetching the key
+          id from a key server and validating the signed text against the key.
+          Markup on the page is altered by ClearSign to show the signature text
+          and the validity of the signature.</p>
+
+        <p>Encryption and signatures are hard to use and are rarely integrated
+          with web content. ClearSign aims to make it easier to use GPG verified
+          content in your existing sites.</p>
 
         <ul>
           <li><a href="#examples">Examples</a></li>
@@ -76,8 +84,30 @@ ClearSign to show the signature text and the validity of the signature.</p>
 
         <a name="examples"></a>
         <h2>Examples</h2>
+        GPG signatures do not exactly make for pretty markup. Here's what one
+        actually looks like:
+        <pre>
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+This is an example of what clearsigned text looks like.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (Darwin)
+Comment: GPGTools - http://gpgtools.org
+
+iEYEARECAAYFAlI494UACgkQXqJVwWo+R3roVgCdGUmhvFJAgM/+SGH3mFPTHoxT
+KcYAn1r6b8JSh3rswpUIMRqZysEa0JDM
+=BV0X
+-----END PGP SIGNATURE-----</pre>
+
+        <p>The actual content to data ratio here is rather low, it is not symantic,
+          won't fit in with your existing design and at the end of it, it is more
+          than a hard sell to anyone design oriented.</p>
 
         <h3>Verified example</h3>
+        The point behind ClearSign is to get the signed content front and center
+        while providing access to the original data. A small badge shows you the
+        status of the signature.
         <div class="gpg-signed-text">
           -----BEGIN PGP SIGNED MESSAGE-----
           Hash: SHA1
@@ -93,7 +123,10 @@ ClearSign to show the signature text and the validity of the signature.</p>
           =IsBx
           -----END PGP SIGNATURE-----
         </div>
+
         <h3>Failed verification example</h3>
+        Here the content is invalid- either the key is wrong, the
+        text has been altered, or the content was improperly signed.
         <div class="gpg-signed-text">
           -----BEGIN PGP SIGNED MESSAGE-----
           Hash: SHA1
@@ -115,16 +148,28 @@ ClearSign to show the signature text and the validity of the signature.</p>
           <li>Add this javascript to your page: <br />
             <code>&lt;script src="https://clearsign.me/clearsign.js"/&gt;&lt;/script&gt;</code>
           </li>
-          <li>Wrap your GPG signature blocks on your pages with <br>
-            <code>&lt;div class=".gpg-signed-text"&gt;&lt;/div&gt;</code>
+          <li>Use GPG to sign content that you are posting on your site.</li>
+          <li>Wrap your GPG clear signed blocks on your pages with <br>
+            <code>&lt;div class="gpg-signed-text"&gt;&lt;/div&gt;</code>
           </li>
         </ul>
 
-        <p>
-        Alternatively you can check this project out from github and run the
-        verification service yourself.
+        <p>You can check this project out from github and run the
+        verification service yourself. <a href="https://github.com/arthur24b6/clearsign">https://github.com/arthur24b6/clearsign</a>
         </p>
-        <a href="https://github.com/arthur24b6/clearsign">https://github.com/arthur24b6/clearsign</a>
+
+        <p>In order to keep the implementation as simple as possible, ClearSign
+          adds jQuery (if not already present) and a CSS file from the one file
+          you need to include to make it work.</p>
+
+        <p>By default, ClearSign will be implemented on all .gpg-signed-text
+          elements. You can instantiate it yourself with
+          <code>$(element).clearsign();</code> You can pass options into it
+          including alternate style sheets and paths to use a different
+          validator. You can hack the HTML that it produces fairly easily.
+        </p>
+
+
 
         <a name="why"></a>
         <h2>Why do this?</h2>
@@ -164,8 +209,6 @@ ClearSign to show the signature text and the validity of the signature.</p>
             limits the ability of people to use it.
           </li>
         </ul>
-
-
 
 
         <a name="background"></a>

@@ -3,6 +3,9 @@
  *
  */
 
+// Set the default domain.
+var domain = 'http://clearsign.me/';
+
 /**
  * Test to make sure that jQuery is loaded on the page. If it isn't load the
  * local version.
@@ -11,7 +14,7 @@ if (typeof jQuery=='undefined') {
   var headTag = document.getElementsByTagName("head")[0];
   var jqTag = document.createElement('script');
   jqTag.type = 'text/javascript';
-  jqTag.src = 'https://clearsign.me/jquery-1.10.1.min.js';
+  jqTag.src = domain + 'jquery-1.10.1.min.js';
   jqTag.onload = main;
   headTag.appendChild(jqTag);
 }
@@ -35,13 +38,12 @@ $.fn.clearsign = function(options) {
 
     // Default options.
     var settings = $.extend({
-      path : 'https://clearsign.me/',
-      cssPath : 'clearsign.css',
+      cssPath : domain + 'clearsign.css',
       css : {
         displayedText : 'gpg-displayed-text',
         signatureInfo : 'gpg-signature-info'
       },
-      gpgValidatorPath : 'clearsign.php'
+      gpgValidatorPath : domain + 'clearsign.php'
     }, options );
 
     var element = this;
@@ -52,7 +54,7 @@ $.fn.clearsign = function(options) {
     function loadCSS(settings) {
       // Only need to do this once.
       if (! $('body').hasClass('clearsign')) {
-        var url = settings.path + settings.cssPath;
+        var url = settings.cssPath;
         if (document.createStyleSheet) {
           try { document.createStyleSheet(options.cssPath); } catch (e) { }
         }
@@ -147,7 +149,7 @@ $.fn.clearsign = function(options) {
 
 
     // Post the signed text to the verifier.
-    var post = $.post(settings.path + settings.gpgValidatorPath, {signed_text : signed_text }, function(data) {
+    var post = $.post(settings.gpgValidatorPath, {signed_text : signed_text }, function(data) {
       // Verification failed with a non-catchable error.
       if (data === false) {
         $(element).addClass('error');
