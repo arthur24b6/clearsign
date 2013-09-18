@@ -4,7 +4,7 @@
  */
 
 // Set the default domain.
-var domain = 'http://clearsign.me/';
+var domain = 'https://clearsign.me/';
 
 /**
  * Test to make sure that jQuery is loaded on the page. If it isn't load the
