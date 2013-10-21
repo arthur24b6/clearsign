@@ -1,10 +1,11 @@
 /**
- * ClearSign
+ * ClearSign | arthur@24b6.net
  *
+ * Released under the GPL3, see LICENSE file.
  */
 
-// Set the default domain.
-var domain = 'https://clearsign.me/';
+
+var domain = "https://clearsign.me/";
 
 /**
  * Test to make sure that jQuery is loaded on the page. If it isn't load the
@@ -26,37 +27,79 @@ else {
 // Code to be run after it is clear that jQuery is enabled
 function main() {
 
-// Enable on all signed text containers.
-$(document).ready(function() {
-  $('.gpg-signed-text').clearsign();
-});
+  // Enable on all signed text containers.
+  $(document).ready(function() {
+    $('.gpg-signed-text').clearsign();
+  });
 
 
-// jQuery plugin.
-$.fn.clearsign = function(options) {
-  return this.each(function () {
+  /* ******************************************************** */
+  /* ClearSign Plugin                                         */
+  /* ******************************************************** */
 
-    // Default options.
-    var settings = $.extend({
-      cssPath : domain + 'clearsign.css',
+  // Defign the plugin.
+  var ClearSign = function(elem, options) {
+    this.elem = elem;
+    this.$elem = $(elem);
+    this.options = options;
+  };
+
+  ClearSign.prototype = {
+    defaults: {
+      domain: domain,
       css : {
+        path : domain + 'clearsign.css',
         displayedText : 'gpg-displayed-text',
         signatureInfo : 'gpg-signature-info'
       },
       gpgValidatorPath : domain + 'clearsign.php'
-    }, options );
-
-    var element = this;
+    },
 
     /**
-     * Load the CSS files from javascript to keep implementation simple.
+     * Main functionality.
      */
-    function loadCSS(settings) {
+    init: function() {
+      // Build the settings.
+      var settings = $.extend({}, this.defaults, this.options);
+
+      // Load necessary CSS.
+      ClearSign.prototype.loadCSS(settings);
+
+      // Text can come from an text element on the page or form. If this is a
+      // form do not transform the the text until the submit button is pressed.
+      var type = this.$elem.get(0).tagName.toLowerCase();
+      if (type == 'form') {
+        var form = this.$elem;
+        // Run on submit of this element.
+        $(form).submit(function() {
+          var signed_text = $('textarea', form).val().replace(/^ +| +$/gm, "");
+          // Build the markup.
+          ClearSign.prototype.createMarkup(signed_text, form, settings);
+          // Validate the text
+          ClearSign.prototype.verify(signed_text, form, settings);
+          return false;
+        });
+      }
+      else if (type == 'div') {
+        var div = this.$elem;
+        var signed_text = $(div).html().replace(/^ +| +$/gm, "");
+        // Build the markup.
+        ClearSign.prototype.createMarkup(signed_text, div, settings);
+        // Validate the text
+        ClearSign.prototype.verify(signed_text, div, settings);
+      }
+
+    },
+
+    /**
+     * Ensure that the CSS file is present on the page.
+     */
+    loadCSS: function (settings) {
       // Only need to do this once.
       if (! $('body').hasClass('clearsign')) {
-        var url = settings.cssPath;
+        var url = settings.css.path;
         if (document.createStyleSheet) {
-          try { document.createStyleSheet(options.cssPath); } catch (e) { }
+          try { document.createStyleSheet(url) } catch (e) { }
         }
         else {
           var css;
@@ -64,47 +107,30 @@ $.fn.clearsign = function(options) {
           css.rel = 'stylesheet';
           css.type = 'text/css';
           css.media = "all";
-          css.href = url;
+          css.href = settings.css.path;
           document.getElementsByTagName("head")[0].appendChild(css);
         }
         $('body').addClass('clearsign');
       }
-    }
-
-
-    /**
-     * Parse the signature out from the raw text.
-     */
-    function getSignature(text) {
-      var pattern = /SIGNATURE[-]*([\s\S]*?)[-]*END*/;
-      var matched = text.match(pattern);
-      return matched[1];
-    }
-
+    },
 
     /**
-     * Parse the text out from the signed text.
-     */
-    function getSignedText(text) {
-      var pattern = /BEGIN[-]*[\s\S]*Hash.*([\s\S]*?)[-]*BEGIN/;
-      var matched = text.match(pattern);
-      return matched[1];
-    }
-
-
-    /**)
      * Add the HTML for displaying the signature information.
      */
-    function buildHTML() {
+    createMarkup: function (signed_text, element, settings) {
+      // Remove existing markup from the container.
+      element.html('');
+
       // Store the text that was signed here.
-      $(element).append('<div class="' + settings.css.displayedText + '" />');
+      element.append('<div class="' + settings.css.displayedText + '" />');
       // Full signed text stored here.
-      $(element).append('<div class="' + settings.css.signatureInfo + '" />');
+      element.append('<div class="' + settings.css.signatureInfo + '" />');
+
       $('.' + settings.css.signatureInfo, element).wrapInner('<pre />');
       $('.'+ settings.css.signatureInfo, element).prepend('<div class="info" />');
 
       // Build the badge attached to the signed text.
-      $(element).append('<div class="clearsign-badge"><div class="interior"><div class="brand">ClearSign</div><div class="status">Checking</div></div></div>');
+      element.append('<div class="clearsign-badge"><div class="interior"><div class="brand">ClearSign</div><div class="status">Checking</div></div></div>');
 
       $('.clearsign-badge', element).click(function () {
         if ($(this).hasClass('open')) {
@@ -117,71 +143,82 @@ $.fn.clearsign = function(options) {
         }
       });
 
-    }
-
+      // Populate the HTML with the signature parts.
+      $('.' + settings.css.displayedText, element).html(this.parseSignedText(signed_text));
+      $('.' + settings.css.signatureInfo + ' pre', element).html(signed_text);
+      element.addClass('validating');
+    },
 
     /**
-     * Utility function to encode HTML entities.
+     * Verify the signed text.
      */
-    function htmlEntityEncode(string) {
+    verify: function (signed_text, element, settings) {
+      // Post the signed text to the verifier.
+      var post = $.post(settings.gpgValidatorPath, {signed_text : signed_text }, function(data) {
+
+        // Verification failed with a non-catchable error.
+        if (data === false) {
+          $(element).addClass('error');
+          $('.clearsign-badge .status', element).html('ERROR');
+        }
+
+        // Signature error condition.
+        else if (typeof data.error !== 'undefined' && data.error) {
+          var string = data.error;
+          // @TODO provide information on why this failed.
+          $(element).addClass('failed');
+          $('.clearsign-badge .status', element).html('FAILED');
+        }
+
+        // Signature should be valid.
+        else {
+          var string = '';
+          string = '<strong>Signature information:</strong><br />';
+          string += 'This text was signed by: ' + ClearSign.prototype.htmlEntityEncode(data.name) + ' ';
+          string += 'on ' + ClearSign.prototype.htmlEntityEncode(data.date) + ' ';
+          string += 'with key ID: ' + data.id;
+
+          $(element).addClass('valid');
+          $('.clearsign-badge .status', element).html('VALID');
+        }
+        $('.' + settings.css.signatureInfo + ' .info', element).html(string);
+
+        $(element).removeClass('validating');
+       }, 'json');
+
+    },
+
+    /**
+     * Utility function to encode strings.
+     */
+    htmlEntityEncode: function (string) {
       return $("<div/>").text(string).html();
+    },
+
+    /**
+     * Parse the signature out from the raw text.
+     */
+    parseSignature: function (text) {
+      var pattern = /SIGNATURE[-]*([\s\S]*?)[-]*END*/;
+      var matched = text.match(pattern);
+      return matched[1];
+    },
+
+    /**
+     * Parse the text out from the signed text.
+     */
+    parseSignedText: function(text) {
+      var pattern = /BEGIN[-]*[\s\S]*Hash.*([\s\S]*?)[-]*BEGIN/;
+      var matched = text.match(pattern);
+      return matched[1];
     }
 
-
-    // -----------------------------------------------------------
-
-    // Load the css.
-    loadCSS(settings)
-
-    // Get the input text and trim whitespace.
-    var signed_text = $(this).text().replace(/^ +| +$/gm, "");
-
-    // Remove existing markup from the container.
-    $(this).html('');
-
-    // Build the ClearSign markup.
-    buildHTML();
-
-    // Populate the HTML with the signature parts.
-    $('.' + settings.css.displayedText, this).html(getSignedText(signed_text));
-    $('.' + settings.css.signatureInfo + ' pre', this).html(signed_text);
-    $(element).addClass('validating');
-
-
-    // Post the signed text to the verifier.
-    var post = $.post(settings.gpgValidatorPath, {signed_text : signed_text }, function(data) {
-      // Verification failed with a non-catchable error.
-      if (data === false) {
-        $(element).addClass('error');
-        $('.clearsign-badge .status', element).html('ERROR');
-      }
-
-      // Signature error condition.
-      else if (typeof data.error !== 'undefined' && data.error) {
-        var string = data.error;
-        // @TODO provide information on why this failed.
-        $(element).addClass('failed');
-        $('.clearsign-badge .status', element).html('FAILED');
-      }
-
-      // Signature should be valid.
-      else {
-        var string = '';
-        string = '<strong>Signature information:</strong><br />';
-        string += 'This text was signed by: ' + htmlEntityEncode(data.name) + ' ';
-        string += 'on ' + htmlEntityEncode(data.date) + ' ';
-        string += 'with key ID: ' + data.id;
-
-        $(element).addClass('valid');
-        $('.clearsign-badge .status', element).html('VALID');
-      }
-      $('.' + settings.css.signatureInfo + ' .info', element).html(string);
-
-      $(element).removeClass('validating');
-     }, 'json');
-
-
-    });
   };
 
-} // main()
+
+  $.fn.clearsign = function (options) {
+    return this.each(function() {
+      new ClearSign(this, options).init();
+    });
+  }
+}
