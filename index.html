@@ -3,7 +3,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>ClearSign: GPG signature verification</title>
-    <script src="https://clearsign.me/clearsign.js"></script>
+    <script src="http://localhost/clearsign.js"></script>
     <style>
       body {
         background-color: #cccccc;
@@ -140,6 +140,24 @@ KcYAn1r6b8JSh3rswpUIMRqZysEa0JDM
           =xGk+
           -----END PGP SIGNATURE-----
         </div>
+
+        <h3>Submit based verification</h3>
+        <form class="gpg-signed-text">
+          <textarea>-----BEGIN PGP SIGNED MESSAGE-----
+          Hash: SHA1
+
+          This is a text file
+
+          -----BEGIN PGP SIGNATURE-----
+          Version: GnuPG/MacGPG2 v2.0.20 (Darwin)
+          Comment: GPGTools - http://gpgtools.org
+
+          iEYEARECAAYFAlIwon4ACgkQdd4ilEXAI+32ywCfbbMs+6ZyeGzFrkvqiE4Hq14w
+          QOwAn3Qt7UEEr8YJ77L2C1ATK3sluq2r
+          =IsBx
+          -----END PGP SIGNATURE-----</textarea>
+          <input type="submit" value="Submit" />
+        </form>
 
         <a name="implement"></a>
         <h2>How to implement</h2>
