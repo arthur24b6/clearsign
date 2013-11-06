@@ -155,6 +155,23 @@ function main() {
     verify: function (signed_text, element, settings) {
       // Post the signed text to the verifier.
       var post = $.post(settings.gpgValidatorPath, {signed_text : signed_text }, function(data) {
+        console.log(data);
+        var signature = '';
+        if (ClearSign.prototype.isset(data.error)) {
+          signature += '<strong>' + ClearSign.prototype.htmlEntityEncode(data.error.message) + '</strong><br /> ';
+        }
+        if (ClearSign.prototype.isset(data.name)) {
+          signature += 'This text was signed by: ' + ClearSign.prototype.htmlEntityEncode(data.name) + ' ';
+        }
+        if (ClearSign.prototype.isset(data.email)) {
+          signature += '<' + data.email + '> ';
+        }
+        if (ClearSign.prototype.isset(data.date)) {
+          signature += 'on ' + ClearSign.prototype.htmlEntityEncode(data.date) + ' ';
+        }
+        if (ClearSign.prototype.isset(data.key)) {
+          signature += 'with key ID: ' + data.id;
+        }
 
         // Verification failed with a non-catchable error.
         if (data === false) {
@@ -163,25 +180,19 @@ function main() {
         }
 
         // Signature error condition.
-        else if (typeof data.error !== 'undefined' && data.error) {
-          var string = data.error;
-          // @TODO provide information on why this failed.
-          $(element).addClass('failed');
-          $('.clearsign-badge .status', element).html('FAILED');
+        else if (ClearSign.prototype.isset(data.error)) {
+          $(element).addClass(data.error.severity);
+          $('.clearsign-badge .status', element).html(data.error.severity.toUpperCase());
         }
 
         // Signature should be valid.
         else {
-          var string = '';
-          string = '<strong>Signature information:</strong><br />';
-          string += 'This text was signed by: ' + ClearSign.prototype.htmlEntityEncode(data.name) + ' ';
-          string += 'on ' + ClearSign.prototype.htmlEntityEncode(data.date) + ' ';
-          string += 'with key ID: ' + data.id;
-
           $(element).addClass('valid');
           $('.clearsign-badge .status', element).html('VALID');
         }
-        $('.' + settings.css.signatureInfo + ' .info', element).html(string);
+        
+        var title = '<strong>Signature information:</strong><br />';
+        $('.' + settings.css.signatureInfo + ' .info', element).html(title + signature);
 
         $(element).removeClass('validating');
        }, 'json');
@@ -211,6 +222,13 @@ function main() {
       var pattern = /BEGIN[-]*[\s\S]*Hash.*([\s\S]*?)[-]*BEGIN/;
       var matched = text.match(pattern);
       return matched[1];
+    },
+    
+    isset: function(variable) {
+      if (typeof(variable) != "undefined" && variable !== null) {
+        return true;
+      }
+      return false;
     }
 
   };

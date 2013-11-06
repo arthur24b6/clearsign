@@ -5,7 +5,6 @@
  * Provides the PHP wrapper around GPG.
  */
 
-
 // Set the headers to allow cross domain posts from javascript.
 header('Access-Control-Allow-Origin: *');
 // Get the posted signed text
@@ -13,6 +12,7 @@ $signed_text = $_POST['signed_text'];
 
 // Verify.
 $verify = new clearSign($signed_text);
+
 // Output.
 print json_encode($verify->key);
 
@@ -77,13 +77,13 @@ class clearSign {
    */
   private function get_key_id() {
     // Verify the signature to find the ID.
-    exec("echo {$this->signed_text} | {$this->gpg_path} -n --verify  2>&1", $output, $ret);
+    exec("echo {$this->signed_text} | {$this->gpg_path} -n --verify 2>&1", $output, $ret);
 
     // Make returned data easily matchable.
     $output = implode(' ', $output);
 
     // Find the key ID.
-    $pattern = "/.*key ID ([a-zA-z0-9]*) /";
+    $pattern = "/.*key ID ([a-zA-z0-9]*)/";
     if (preg_match($pattern, $output, $matches)) {
       $this->key['id'] = $matches[1];
     }
@@ -102,7 +102,16 @@ class clearSign {
    */
   private function key_lookup() {
     // Fetch the key and place it in the temporary key chain.
-    exec("{$this->gpg_path} --no-default-keyring --keyring {$this->tmp_keychain} --recv-keys {$this->key['id']} 2>&1");
+    exec("{$this->gpg_path} --no-default-keyring --keyring {$this->tmp_keychain} --recv-keys {$this->key['id']} --keyserver=http://pgp.mit.edu 2>&1", $output, $ret);
+
+    $output = implode(' ', $output);
+           
+    // Get the key name and email address. 
+    $pattern = "/public key \"(.*)<(.*)>\"/";
+    if (preg_match($pattern, $output, $matches)) {
+      $this->key['name'] = $matches[1];
+      $this->key['email'] = $matches[2]; 
+    }
 
     // Use the imported key to check the signed text.
     exec("echo {$this->signed_text} | {$this->gpg_path} --no-default-keyring --keyring {$this->tmp_keychain} --verify 2>&1", $output, $ret);
@@ -121,14 +130,21 @@ class clearSign {
     $pattern = '/BAD signature/';
     if (preg_match($pattern, $output)) {
       $this->key['error'] = 'Bad signature';
+      $this->key['error'] = array(
+        "severity" => "failed",
+        "message" => "Bad signature for the signed text."
+      );
     }
-
-    // Check for any valid key data that is achived on --verify.
-    $pattern = '/.*Good signature from "(.*?)";/';
+    
+    $pattern = "/Can't check signature: public key not found/";
     if (preg_match($pattern, $output, $matches)) {
-      $this->key['name'] = $matches[1];
+      $this->key['error'] = array(
+        "severity" => "error",
+        "message" => "Can't check signature: public key not found"
+      );
     }
   }
 
 }
+
 
