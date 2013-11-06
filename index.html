@@ -2,8 +2,8 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>ClearSign: GPG signature verification</title>
-    <script src="http://localhost/clearsign.js"></script>
+    <title>ClearSign: GPG signature verification on the web</title>
+    <script src="http://clearsign.me/clearsign.js"></script>
     <style>
       body {
         background-color: #cccccc;
@@ -50,35 +50,42 @@
         padding: 10px;
         overflow: scroll;
       }
+      #test-sign {
+        width: 100%;
+        min-height: 200px;
+
+      }
     </style>
   </head>
   <body>
     <div id="wrapper">
       <div id="header">
         <span id="sun">&#9788;</span>
-        <h1>Verify clear signed GPG text</h1>
+        <h1>Verify clear signed GPG texton the web</h1>
       </div>
       <div id="content">
 
-        <p>ClearSign makes it easy to verify <a href="http://www.gnupg.org">GPG</a>
+        <p>ClearSign aims to make it easy to verify <a href="http://www.gnupg.org">GPG</a>
           signed text blocks on webpages with a simple Javascript inclusion.</p>
 
         <p>ClearSign works by sending signed text from an HTML element back to a
-          PHP wrapper around GPG to extract the signing key id, fetching the key
-          id from a key server and validating the signed text against the key.
-          Markup on the page is altered by ClearSign to show the signature text
-          and the validity of the signature.</p>
+          different server which uses a PHP wrapper around GPG to extract the
+          signing key id, fetching the key id from a key server and validating
+          the signed text against the key. Markup on the original page is
+          altered by ClearSign to show only the signature text and the validity
+          of the signature.</p>
 
-        <p>Encryption and signatures are hard to use and are rarely integrated
-          with web content. ClearSign aims to make it easier to use GPG verified
-          content in your existing sites.</p>
+        <p>Integrating encryption and signed text into a web application is hard
+          as it generally requires storing a secrete key on the server- a
+          generally unwise idea. The intent of this project is to make it easier
+          for readers to engage with GPG content- it does not solve the problem
+          of handling encryption/signing in a web application.</p>
 
         <ul>
           <li><a href="#examples">Examples</a></li>
           <li><a href="#implement">How to implement</a></li>
           <li><a href="#why">Why do this?</a></li>
           <li><a href="#limits">Limits</a></li>
-          <li><a href="#background">Background</a></li>
         </ul>
 
 
@@ -143,7 +150,7 @@ KcYAn1r6b8JSh3rswpUIMRqZysEa0JDM
 
         <h3>Submit based verification</h3>
         <form class="gpg-signed-text">
-          <textarea>-----BEGIN PGP SIGNED MESSAGE-----
+          <textarea id="test-sign">-----BEGIN PGP SIGNED MESSAGE-----
           Hash: SHA1
 
           This is a text file
@@ -227,12 +234,6 @@ KcYAn1r6b8JSh3rswpUIMRqZysEa0JDM
             limits the ability of people to use it.
           </li>
         </ul>
-
-
-        <a name="background"></a>
-        <h2>Background</h2>
-        Information about GPG, links to instructions
-
 
       </div>
     </div>
