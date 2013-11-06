@@ -15,14 +15,15 @@
   margin: 10px;
 }
 
+/* Note, 'error' is passed back from the gpg wrapper- may need additional
+   statuses here. */
 .gpg-signed-text.error{
-  border: 1px dotted red;
+  border: 1px dotted orange;
 }
 
 .gpg-signed-text.failed {
   border: 1px dotted #ff0000;
 }
-
 
 .gpg-signature-info {
   display: none;
@@ -39,7 +40,6 @@
 .gpg-signature-info pre {
   margin: 0 10px;
 }
-
 
 .clearsign-badge {
   background-color: #ffffff;
@@ -91,7 +91,7 @@
 }
 
 .gpg-signed-text.failed .clearsign-badge .status {
-  background-color: #dd0000;
+  background-color: red;
   color: #ffffff;
 }
 
