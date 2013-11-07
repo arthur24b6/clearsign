@@ -155,7 +155,6 @@ function main() {
     verify: function (signed_text, element, settings) {
       // Post the signed text to the verifier.
       var post = $.post(settings.gpgValidatorPath, {signed_text : signed_text }, function(data) {
-        console.log(data);
         var signature = '';
         if (ClearSign.prototype.isset(data.error)) {
           signature += '<strong>' + ClearSign.prototype.htmlEntityEncode(data.error.message) + '</strong><br /> ';
